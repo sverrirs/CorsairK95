@@ -5,8 +5,6 @@ A C# library and example project showing how to interface with the Corsair K95 G
 
 [The Corsair K95 Product Website](http://www.corsair.com/en-us/vengeance-k95-fully-mechanical-gaming-keyboard/)
 
-The project page can be found at [http://sverrirs.github.io/XboxBigButton/](http://sverrirs.github.io/XboxBigButton/)
-
 # Driver installer
 A downloadable binary for the driver install (both 32 and 64 bit versions) can be found under *WinUsbDriver/binaries* folder. 
 Note: These installers have not been tested with Win8 and newer so they might not work (due to the fact that Windows 8+ requires .inf files to be signed as well)
