@@ -1,0 +1,90 @@
+[Version]
+Signature="$Windows NT$"
+Class=Media
+ClassGuid={4d36e96c-e325-11ce-bfc1-08002be10318}
+Provider=%ProviderName%
+DriverVer=10/10/2015,1.0.0
+; CatalogFile=catalog.cat
+; CatalogFile=winusb.cat
+
+[Manufacturer]
+%ProviderName% = MyWinUSBDevice,NTx86,NTamd64
+
+[MyWinUSBDevice.NTx86]
+%DeviceName0%=USB_Install, USB\VID_1B1C&PID_1B08&MI_00
+%DeviceName1%=USB_Install, USB\VID_1B1C&PID_1B08&MI_01
+; Don't register interface 2 as it is the hid device for the keyboard, let Windows install the default for that
+;%DeviceName2%=USB_Install, USB\VID_1B1C&PID_1B08&MI_02
+
+[MyWinUSBDevice.NTamd64]
+%DeviceName0%=USB_Install, USB\VID_1B1C&PID_1B08&MI_00
+%DeviceName1%=USB_Install, USB\VID_1B1C&PID_1B08&MI_01
+; Don't register interface 2 as it is the hid device for the keyboard, let Windows install the default for that
+;%DeviceName2%=USB_Install, USB\VID_1B1C&PID_1B08&MI_02
+
+; =================== Installation ===================
+
+[USB_Install]
+Include=winusb.inf
+Needs=WINUSB.NT
+
+[USB_Install.Services]
+Include=winusb.inf
+AddService=WinUSB,0x00000002,WinUSB_ServiceInstall
+
+[WinUSB_ServiceInstall]
+DisplayName     = %WinUSB_SvcDesc%
+ServiceType     = 1
+StartType       = 3
+ErrorControl    = 1
+ServiceBinary   = %12%\WinUSB.sys
+
+[USB_Install.Wdf]
+KmdfService=WINUSB, WinUsb_Install
+
+[WinUSB_Install]
+KmdfLibraryVersion=1.11
+
+[USB_Install.HW]
+AddReg=Dev_AddReg
+
+[Dev_AddReg]
+HKR,,DeviceInterfaceGUIDs,0x10000,"{0F42485A-C797-4B13-813B-3E3EC5691526}"
+
+[USB_Install.CoInstallers]
+AddReg=CoInstallers_AddReg
+CopyFiles=CoInstallers_CopyFiles
+
+[CoInstallers_AddReg]
+HKR,,CoInstallers32,0x00010000,"WdfCoInstaller01011.dll,WdfCoInstaller","winusbcoinstaller2.dll"
+
+[CoInstallers_CopyFiles]
+winusbcoinstaller2.dll
+WdfCoInstaller01011.dll
+
+[DestinationDirs]
+CoInstallers_CopyFiles=11
+
+[SourceDisksNames]
+1 = %InstallDisk%,,,\x86
+2 = %InstallDisk%,,,\amd64
+
+[SourceDisksFiles.x86]
+winusbcoinstaller2.dll=1
+WdfCoInstaller01011.dll=1
+
+[SourceDisksFiles.amd64]
+winusbcoinstaller2.dll=2
+WdfCoInstaller01011.dll=2
+
+[Strings]
+ProviderName="K95 Sverrir Sigmundarson"
+Manufacturer="Corsair"
+DeviceName0="Corsair K95 Gaming Keyboard Driver (Custom M0)"
+DeviceName1="Corsair K95 Gaming Keyboard Driver (Custom M1)"
+; Don't register interface 2 as it is the hid device for the keyboard, let Windows install the default for that
+;DeviceName2="Corsair K95 Gaming Keyboard Driver (Custom M2)"
+DisplayClassName="Corsair K95 Custom Controllers"
+InstallDisk="WinUSB Installation disk or directory"
+WinUSB_SvcDesc="WinUSB Device for Corsair K95 Gaming Keyboard"
+DEVICEMANAGERCATEGORY="Custom USB Devices" ; ClassName

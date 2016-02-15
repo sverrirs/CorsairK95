@@ -1,0 +1,42 @@
+///////////////////////////////////////////////////////////////////////////////////////////////
+// Device 0: Used for LED control buttons and gamer keys, memory buttons, windows lock key function
+
+Byte 2: MR on 246, MR off 247, M1 241, M2 242, M3 243, Toggle lights 204, Brightness( 250 =off, 251 =33%, 252 =66%, 253 =100%)
+Byte 2: Windows lock key 244 =on 245 =off
+Byte 2: Number of G button (208 to 223 (G1-G16) and 232 (G17) and 233 (G18)
+
+    Interface - id:0, protocol:1, class:3, subclass:1
+    Pipes: 1
+    Pipe - Address:129, isIn:True, isOut:False, maxPacketSize:8
+    
+    
+///////////////////////////////////////////////////////////////////////////////////////////////
+// Device 1: Blocks on read, no write, Used for Volume controller and media function keys on keyboard
+    Interface - id:1, protocol:0, class:3, subclass:0
+    Pipes: 1
+    Pipe - Address:130, isIn:True, isOut:False, maxPacketSize:4
+
+// Examples
+// When volume is decreased
+// Byte 0: 0
+// Byte 1: EA
+// Byte 2: 0
+// Byte 3: 0
+// Byte 4: 0
+
+// When volume is increased
+// Byte 0: 0
+// Byte 1: E9
+// Byte 2: 0
+// Byte 3: 0
+// Byte 4: 0
+
+// When mute button is pressed
+// Byte 0: 0
+// Byte 1: E2
+// Byte 2: 0
+// Byte 3: 0
+// Byte 4: 0
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+// Device 2: the HID device for the keyboard input, leave this one alone
