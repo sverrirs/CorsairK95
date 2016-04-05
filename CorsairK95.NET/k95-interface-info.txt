@@ -16,27 +16,172 @@ Byte 2: Number of G button (208 to 223 (G1-G16) and 232 (G17) and 233 (G18)
     Pipes: 1
     Pipe - Address:130, isIn:True, isOut:False, maxPacketSize:4
 
-// Examples
-// When volume is decreased
-// Byte 0: 0
-// Byte 1: EA
-// Byte 2: 0
-// Byte 3: 0
-// Byte 4: 0
-
-// When volume is increased
-// Byte 0: 0
-// Byte 1: E9
-// Byte 2: 0
-// Byte 3: 0
-// Byte 4: 0
-
-// When mute button is pressed
-// Byte 0: 0
-// Byte 1: E2
-// Byte 2: 0
-// Byte 3: 0
-// Byte 4: 0
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // Device 2: the HID device for the keyboard input, leave this one alone
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+// Running a live USBPcap session in wireshark
+
+"C:\Program Files\USBPcap\USBPcapCMD.exe" -d "\\.\USBPcap2" -o - | "C:\Program Files\Wireshark\Wireshark.exe" -k -i -
+
+
+4 \\.\USBPcap6
+  \??\USB#ROOT_HUB#4&29e1bf0e&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}
+    [Port 1] USB Composite Device
+      Corsair K95 Gaming Keyboard Driver (Custom M0)
+      USB Input Device
+        HID-compliant consumer control device
+      USB Input Device
+        HID Keyboard Device
+    [Port 2] USB Input Device
+      HID-compliant mouse
+      
+      
+Filters:
+
+USB URB_CONTROL only
+usb.bus_id == 2 && usb.device_address == 1 && (usb.transfer_type == 0x2 || usb.transfer_type == 0x3)
+
+Only OUT
+usb.bus_id == 6 && usb.device_address == 1 && (usb.transfer_type == 0x2 || usb.transfer_type == 0x3) && usb.endpoint_number.direction == 0
+      
+////////////////////////////////////////////////////////////////////////////////////////////////
+// Control packets
+// Control the LED light intensity
+bmRequestType: 0x40
+bRequest: 0x31
+wValue: 0x0001
+Values( 0x0000 =off, 0x0001 =33%, 0x0002 =66%, 0x0003 =100%)
+
+// Set memory M1, M2, M3 active
+bmRequestType: 0x40
+bRequest: 0x14
+wValue: 0x0001
+Values( 0x0001 =M1, 0x0002 =M2, 0x0003 =M3)
+
+// Set MR on
+bmRequestType: 0x40
+bRequest: 0x02
+wValue: 0x0020
+
+// Set MR to off (three packets being sent)
+bmRequestType: 0x40
+bRequest: 0x02
+wValue: 0x0040
+
+bmRequestType: 0x40
+bRequest: 0x02
+wValue: 0x0040
+
+bmRequestType: 0x40
+bRequest: 0x02
+wValue: 0x0030
+
+// Hardware playback on
+bmRequestType: 0x40
+bRequest: 0x02
+wValue: 0x0001
+
+// Hardware playback off
+bmRequestType: 0x40
+bRequest: 0x02
+wValue: 0x0030
+
+bmRequestType, bRequest, wValue, wIndex, data
+
+
+// Set key lights on/off
+bmRequestType: 0x21
+bRequest: 0x09
+wValue: 0x0200
+wIndex: 0
+000 = all off
+111 = all on
+100 = only numlock on
+010 = only capslock on
+001 = only scroll lock on
+
+// Could this be individual lights?    
+//https://github.com/ccMSC/ckb/blob/master/src/ckb-daemon/usb_linux.c
+#define MSG_SIZE    64
+struct usbdevfs_ctrltransfer transfer = { 0x21, 0x09, 0x0300, 0x03, MSG_SIZE, 5000, (void*)out_msg };
+
+                                          bmRequestType bRequest  wValue  wIndex  leninbytes   timeout   data
+struct usbdevfs_ctrltransfer transfer = { 0x21,         0x09,     0x0200, 0x00,   1,           500,      &kb->ileds }
+
+uchar msg[3][MSG_SIZE] = {
+  { 0x07, 0x04, 0 },                  // Disables or enables HW control for top row
+  { 0x07, 0x40, 0 },                  // Selects key input
+  { 0x07, 0x05, 2, 0, 0x03, 0x00 }    // Commits key input selection
+};1
+
+// So send two messages
+bmRequestType: 0x21
+bRequest: 0x09
+wValue: 0x0300
+wIndex: 0x03
+0x07, 0x40, 
+
+
+// Saving keys to K95
+1. Hardware playback on
+2. Send keys in two control transfers each
+3. Hardware playback off
+      
+"Profile 2"
+G1 6 key down
+   6 key up
+
+   
+    bmRequestType: 0x40
+    bRequest: 0x10
+    wValue: 0x0000
+    wIndex: 1
+    wLength: 95
+    12 00 5f 00 0c 20 00 00 00 0c
+    
+    bmRequestType: 0x40
+    bRequest: 0x12
+    wValue: 0x0000
+    wIndex: 1
+    wLength: 12
+    84 23 01 84 23 00 87 00 32 86 00 01
+
+    bmRequestType: 0x40
+    bRequest: 0x16
+    wValue: 0x0000
+    wIndex: 1
+    wLength: 37
+    12 d0 01 d1 01 d2 01 d3 01 d4 01 d5 01 d6 01 d7 01 d8 01 d9 01 da 01 db 01 dc 01 dd 01 de 01 df 01 e8 01 e9 01
+    
+    
+    bmRequestType: 0x40
+    bRequest: 0x10
+    wValue: 0x0000
+    wIndex: 2
+    wLength: 95
+    12 00 5f
+    
+    bmRequestType: 0x40
+    bRequest: 0x16
+    wValue: 0x0000
+    wIndex: 2
+    wLength: 37
+    12 d0 01 d1 01 d2 01 d3 01 d4 01 d5 01 d6 01 d7 01 d8 01 d9 01 da 01 db 01 dc 01 dd 01 de 01 df 01 e8 01 e9 01
+    
+    bmRequestType: 0x40
+    bRequest: 0x10
+    wValue: 0x0000
+    wIndex: 3
+    wLength: 95
+    12 00 5f
+    
+    bmRequestType: 0x40
+    bRequest: 0x16
+    wValue: 0x0000
+    wIndex: 3
+    wLength: 37
+    12 d0 01 d1 01 d2 01 d3 01 d4 01 d5 01 d6 01 d7 01 d8 01 d9 01 da 01 db 01 dc 01 dd 01 de 01 df 01 e8 01 e9 01

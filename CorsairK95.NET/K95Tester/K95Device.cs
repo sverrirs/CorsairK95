@@ -10,6 +10,17 @@ using MadWizard.WinUSBNet;
 
 namespace K95Tester
 {
+    /// <summary>
+    /// The light intensity for the LED lights
+    /// </summary>
+    public enum LedBrightness
+    {
+        Off = 0x0000, 
+        Low = 0x0001,
+        Medium = 0x0002,
+        High = 0x0003
+    }
+
     public class K95Device : IDisposable
     {
         /// <summary>
@@ -87,15 +98,6 @@ namespace K95Tester
                 _bgWorker.RunWorkerAsync(_device);
 
                 Thread.Sleep(1000);
-
-                // Send a test control message
-                _device.ControlOut(0x40, 0x31, 0x0001, 0);
-                Thread.Sleep(50);
-                _device.ControlOut(0x40, 0x31, 0x0002, 0);
-                Thread.Sleep(100);
-                _device.ControlOut(0x40, 0x31, 0x0003, 0);
-                Thread.Sleep(250);
-                _device.ControlOut(0x40, 0x31, 0x0000, 0);
             }
             catch (Exception e)
             {
@@ -103,6 +105,53 @@ namespace K95Tester
                 _device = null;
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Prints out detailed device information for all K95 devices connected.
+        /// </summary>
+        public void PrintDevices()
+        {
+            var devices = USBDevice.GetDevices(_deviceInterfaceGuid);
+            if (devices.Length <= 0)
+            {
+                Console.WriteLine("No devices found for GUID: "+_deviceInterfaceGuid );
+                return;
+            }
+
+            foreach (var deviceDetails in devices)
+            {
+                using (USBDevice device = new USBDevice(deviceDetails))
+                {
+                    PrintInfo(device);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sends a raw Control Out message to the keyboard with an optional byte buffer payload.
+        /// See more info at: http://www.beyondlogic.org/usbnutshell/usb6.shtml
+        /// </summary>
+        /// <param name="requestType">The bmRequestType of request to make (x40 or x21).
+        /// The bmRequestType field will determine the direction of the request, type of request and designated recipient. 
+        /// The bmRequestType is normally parsed and execution is branched to a number of handlers such as a Standard Device request handler, 
+        /// a Standard Interface request handler, a Standard Endpoint request handler, a Class Device request handler etc.</param>
+        /// <param name="request">The function request to execute on the board</param>
+        /// <param name="value">The value to set</param>
+        /// <param name="index">Optional, the control index to send this to (there are usually four). Default it zero.</param>
+        /// <param name="buffer">optional, the data payload to send to the keyboard along with the message</param>
+        public void Send(byte requestType, byte request, int value, int index = 0, byte[] buffer = null )
+        {
+            _device.ControlOut(requestType, request, value, index, buffer ?? new byte[0]);
+        }
+
+        /// <summary>
+        /// Controls the backlight brightness of the entire keyboard.
+        /// </summary>
+        /// <param name="brightness">The brightness level requested</param>
+        public void SetLedBrightness( LedBrightness brightness )
+        {
+            Send(0x40, 0x31, (int)brightness, 0);
         }
 
         public void Disconnect()
@@ -173,15 +222,18 @@ namespace K95Tester
                     for (int i = 0; i < inbuffer.Length; i++)
                     {
                         var inbyte = inbuffer[i];
-                        Console.WriteLine("{0}: {1}", i, inbyte);
+                        if( inbyte == 0 )
+                            continue;
+
+                        Console.WriteLine("{0}: {1:X}", i, inbyte);
                     }
 
                     inbuffer.CopyTo(prevbuffer, 0);
                 }
-                else
+                /*else
                 {
                     Console.WriteLine("Nothing read from pipe");
-                }
+                }*/
             }
         }
 
@@ -199,7 +251,5 @@ namespace K95Tester
                 _device = null;
             }
         }
-
-        
     }
 }

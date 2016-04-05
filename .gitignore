@@ -237,8 +237,3 @@ ModelManifest.xml
 
 # Unity3D Generated File On Crash Reports
 sysinfo.txt
-
-#################################
-# ignore the UNITY PROJECT IN EXAMPLES
-Examples/UnityExplosions/
-Examples/WpfSoundsAndSprites/
