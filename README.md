@@ -15,6 +15,31 @@ Note: These installers have not been tested with Win8 and newer so they might no
 * Requires the custom driver in the *WinUsbDriver* folder to be installed prior to running any of the code.
 
 # Examples
+
+Cycles through the LED backlighting brightness
+
 ```csharp
-// todo
+K95Device usb = new K95Device();
+try
+{
+    usb.Connect();
+
+    LedBrightness[] ledbrightness = {LedBrightness.Off,
+                                     LedBrightness.Low, LedBrightness.Medium, LedBrightness.High,
+                                     LedBrightness.Medium, LedBrightness.Low };
+
+    // Now cycle through the brightness intensities for the keyboard
+    for ( int i = 0; i < 10000; i++)
+    {
+        usb.SetLedBrightness(ledbrightness[i % ledbrightness.Length]);
+
+        // Short wait to let the hardware get ready again and the user to notice the change
+        Thread.Sleep(150);
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine(ex.ToString());
+    usb.Disconnect();
+}
 ```
