@@ -11,7 +11,7 @@ Note: These installers have not been tested with Win8 and newer so they might no
 
 # Dependencies
 * Uses the [WinUsb.NET](https://github.com/madwizard-thomas/winusbnet/) project 
-* The Corsair driver must be completely uninstalled and removed from the users system before attempting to install the custom driver
+* The Corsair driver must be uninstalled and completely removed from the users system before attempting to install the custom driver (if using the installer). Manually updating the driver through Device Manager will allow for both drivers to be present on the user's system.
 * Requires the custom driver in the *WinUsbDriver* folder to be installed prior to running any of the code.
 
 # Examples
