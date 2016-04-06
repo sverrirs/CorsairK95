@@ -20,7 +20,7 @@ Note: These installers have not been tested with Win8 and newer so they might no
 # Examples
 
 The code below cycles through the LED backlighting brightness
-<a href="https://www.youtube.com/watch?v=UFa_v60nUy4" target="_blank">( see it in action).</a>
+<a href="https://www.youtube.com/watch?v=UFa_v60nUy4" target="_new">(see it in action).</a>
 
 ```csharp
 K95Device usb = new K95Device();
