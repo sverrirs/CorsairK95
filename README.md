@@ -3,6 +3,9 @@ A C# library and example project showing how to interface with the Corsair K95 G
 
 ![Vengeance K95 Fully Mechanical Gaming Keyboard](http://cwsmgmt.corsair.com/media/catalog/product/k/9/k95_11_angle.png "The K95 Keyboard")
 
+My blog entry discussing this project:
+https://blog.sverrirs.com/2016/04/reverse-engineer-usb-protocol.html
+
 [The Corsair K95 Product Website](http://www.corsair.com/en-us/vengeance-k95-fully-mechanical-gaming-keyboard/)
 
 # Driver installer
@@ -16,7 +19,7 @@ Note: These installers have not been tested with Win8 and newer so they might no
 
 # Examples
 
-Cycles through the LED backlighting brightness
+The code below cycles through the LED backlighting brightness
 
 ```csharp
 K95Device usb = new K95Device();
@@ -43,3 +46,6 @@ catch (Exception ex)
     usb.Disconnect();
 }
 ```
+
+Demo
+<iframe width="1280" height="720" src="https://www.youtube.com/embed/UFa_v60nUy4" frameborder="0" allowfullscreen></iframe>
